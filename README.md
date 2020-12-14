@@ -1,6 +1,6 @@
 # Neural_Quality_Enhancer
 
-[-] Data Generation
+[X] Data Generation
 
 <b> Building Dataset and Transformation
   
