@@ -2,10 +2,10 @@
 
 - [ ] Data Generation
 
-<b> Building Dataset and Transformation
+- [ ] Building Dataset and Transformation
   
-<b> Architecture
+- [ ] Model Architecture
+
+- [ ] Model Evaluation
   
-<b> Model Evaluation
-  
-<b> Using this Repository
+- [ ] Using this Repository
