@@ -1,8 +1,8 @@
 # Neural_Quality_Enhancer
 
-- [ ] Data Generation
+- [ X ] Data Generation
 
-- [ ] Building Dataset and Transformation
+- [ X ] Building Dataset and Transformation
   
 - [ ] Model Architecture
 
