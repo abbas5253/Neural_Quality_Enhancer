@@ -4,7 +4,7 @@
 
 - [X] Building Dataset and Transformation
   
-- [ ] Model Architecture
+- [X] Model Architecture
 
 - [ ] Model Evaluation
   
