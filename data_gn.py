@@ -1,5 +1,6 @@
 import argparse
 import os
+import random
 from skimage import io
 from skimage.transform import rescale, resize
 import matplotlib.pyplot as plt
@@ -12,26 +13,33 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-def build_DataLoader(name_list, root_dir, transform=None):
+def build_DataLoader(name_list, root_dir, batch_size=4, transform=None):
     
     trainset = CustomDataset(name_list, root_dir, transform=transforms.Compose([
                                                ToTensor()
                                            ]))
     
-    data_loader = DataLoader(trainset, batch_size=1)
+    data_loader = DataLoader(trainset, batch_size=batch_size)
     
     return data_loader
-    
 
-
-def convert_to_lowq(image):
+def convert_to_lowq(image, scale_range=0.70):
     
-    #scale to 0.25 then to 4x
-    image = rescale(image, (0.75, 0.75, 1))
-    image = rescale(image, (4/3,4/3,1))
+    """
+    Args:
+        image : image to be converted into low quality
+        scale_range : lower range upto which image can be rescaled
+        random : random scaling range
+
+    """
+        
+    image = rescale(image, (scale_range, scale_range, 1))
+    image = rescale(image, (1/scale_range, 1/scale_range ,1))
     
     return image
 
+
+    
 
 
 class CustomDataset(Dataset):
@@ -59,10 +67,9 @@ class CustomDataset(Dataset):
         img_name = os.path.join(self.root_dir,
                                 self.name_list[0]) 
         image = io.imread(img_name)
-#         landmarks = self.landmarks_frame.iloc[idx, 1:]
-#         landmarks = np.array([landmarks])
-#         landmarks = landmarks.astype('float').reshape(-1, 2)
+
         lowq_image = convert_to_lowq(image)
+        
         sample = {'low': lowq_image, 'high':image}
 
         if self.transform:
@@ -77,6 +84,9 @@ class ToTensor(object):
 
     def __call__(self, sample):
         lowq, highq = sample['low'], sample['high']
+        
+        lowq = resize(lowq, (224,224,3))
+        highq = resize(highq, (224,224,3))
 
         # swap color axis because
         # numpy image: H x W x C
@@ -85,6 +95,13 @@ class ToTensor(object):
         highq = highq.transpose((2, 0, 1))
         return {'low': torch.from_numpy(lowq),
                 'high': torch.from_numpy(highq)}
+    
+    
+    
+    
+
+    
+
 
     
 
