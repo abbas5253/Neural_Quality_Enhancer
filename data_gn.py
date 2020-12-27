@@ -19,7 +19,7 @@ def build_DataLoader(name_list, root_dir, batch_size=4, transform=None):
                                                ToTensor()
                                            ]))
     
-    data_loader = DataLoader(trainset, batch_size=batch_size)
+    data_loader = DataLoader(trainset, batch_size=batch_size, num_workers=2, pin_memory=True)
     
     return data_loader
 
@@ -53,6 +53,7 @@ class CustomDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
+        print(len(name_list))
         self.name_list  = name_list
         self.root_dir = root_dir
         self.transform = transform
@@ -65,12 +66,11 @@ class CustomDataset(Dataset):
             idx = idx.tolist()
 
         img_name = os.path.join(self.root_dir,
-                                self.name_list[0]) 
+                                self.name_list[idx]) 
         image = io.imread(img_name)
 
-        lowq_image = convert_to_lowq(image)
         
-        sample = {'low': lowq_image, 'high':image}
+        sample = {'low': convert_to_lowq(image), 'high':image}
 
         if self.transform:
             sample = self.transform(sample)
@@ -85,15 +85,16 @@ class ToTensor(object):
     def __call__(self, sample):
         lowq, highq = sample['low'], sample['high']
         
-        lowq = resize(lowq, (224,224,3))
-        highq = resize(highq, (224,224,3))
+        lowq = resize(lowq, (255,255,3))
+        highq = resize(highq, (255,255,3))
 
         # swap color axis because
         # numpy image: H x W x C
         # torch image: C X H X W
-        lowq = lowq.transpose((2, 0, 1))
-        highq = highq.transpose((2, 0, 1))
-        return {'low': torch.from_numpy(lowq),
+        lowq = lowq.transpose((2, 0, 1))/255
+        highq = highq.transpose((2, 0, 1))/255
+        
+        return {'low': torch.from_numpy(lowq).float(),
                 'high': torch.from_numpy(highq)}
     
     

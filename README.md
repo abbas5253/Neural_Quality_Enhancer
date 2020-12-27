@@ -6,6 +6,8 @@
   
 - [X] Model Architecture
 
+- [ ] Training
+
 - [ ] Model Evaluation
   
 - [ ] Using this Repository
